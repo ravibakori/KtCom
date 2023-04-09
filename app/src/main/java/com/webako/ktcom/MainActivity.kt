@@ -1,18 +1,20 @@
 package com.webako.ktcom
 
+
 import android.os.Bundle
-
-
-
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
-
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +40,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun GreetingOn(){
+
+
     val empList = listOf<Employe>(
         Employe("John Sinha1", "89700000001","500001"),
         Employe("John Sinha2", "89700000002","500002"),
@@ -62,33 +66,69 @@ fun GreetingOn(){
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun Greeting(UserList: List<Employe>) {
 
+ LazyColumn(){
+     items(UserList){
+         EmpCard(emp = it)
+     }
+ }
+    
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EmpCard(emp:Employe)
+{
+    ElevatedCard(modifier = Modifier
+        .padding(6.dp)
+        .fillMaxWidth()
+        .animateContentSize(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        )
 
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-        UserList.forEach() {
-            ElevatedCard(modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()
 
-            ) {
-                Row {
-                    ProfileImage()
-                    Column {
-                        TextDetails(tag = "name", name = it.employeName)
-                        TextDetails(tag = "contact", name = it.employeContact)
-                        TextDetails(tag = "Empid", name = it.employeID)
-                    }
+
+    ) { var expanded by remember {
+        mutableStateOf( false)
+
+    }
+
+        Row {
+            ProfileImage()
+            Column {
+                TextDetails(tag = "name", name = emp.employeName)
+                TextDetails(tag = "contact", name = emp.employeContact)
+                TextDetails(tag = "Empid", name = emp.employeID)
+                if(expanded)
+                {
+                    TextDetails(tag = "Nickname", name = "Babu")
                 }
             }
-
+            Spacer(modifier = Modifier.padding(start= 20.dp))
+            ExpIcon(onClick = { expanded = !expanded}, expanded = expanded)
 
         }
     }
+
+
 }
 
+
+
+
+@Composable
+fun ExpIcon(onClick:()->Unit ,expanded:Boolean)
+{
+    IconButton(onClick = onClick) {
+        Icon(imageVector = Icons.Filled.Info, contentDescription = "" )
+    }
+
+}
 @Composable
 fun ProfileImage(){
     Image(painter = painterResource(id = R.drawable.profile_pic_1),
@@ -96,11 +136,12 @@ fun ProfileImage(){
         modifier = Modifier
             .size(70.dp)
             .padding(8.dp)
+
     )
 }
 @Composable
 fun TextDetails(tag:String, name:String){
-    Text(text = "$tag : $name", modifier = Modifier.padding(0.dp)
+    Text(text = "$tag : $name", modifier = Modifier.padding(4.dp)
     )
 }
 
